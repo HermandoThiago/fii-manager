@@ -20,7 +20,6 @@ def seed_database():
     """
 
     try:
-
         fiis = pd.read_csv('./app/database/fiis.csv')
 
         # Connect to the MySQL database

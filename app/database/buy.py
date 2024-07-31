@@ -88,3 +88,52 @@ def all_purchases() -> pd.DataFrame:
   db.close()
 
   return df
+
+def purchases_group_fii_quantity() -> pd.DataFrame:
+  """
+    Retrieves the total quantity of shares (cotas) purchased for each Fundo de Investimento Imobiliário (FII)
+    from the 'compras' table in the database and returns them as a pandas DataFrame.
+
+    This function performs the following steps:
+    1. Establishes a connection to a MySQL database using the provided credentials.
+    2. Executes a SQL query to select the total quantity of shares for each FII from the 'compras' table,
+       grouped by the 'fundo' column.
+    3. Fetches the result set and converts it into a pandas DataFrame.
+    4. Closes the connection to the database.
+    5. Returns the DataFrame containing the total quantity of shares for each FII.
+
+    Returns:
+    pd.DataFrame: A DataFrame containing two columns: 'fundo' (the FII ticker symbol) and 'total_cotas' (the total quantity of shares purchased).
+
+    Notes:
+    - Ensure that the 'compras' table exists in the 'fiis' database.
+    - The function assumes that the database credentials (host, user, password) are correct and that the 'fiis' database exists.
+  """
+  # Connect to the MySQL database
+  db = mysql.connect(
+      host="localhost",
+      user="user",
+      passwd="password",
+      database="fiis" 
+  )
+
+  cursor = db.cursor()
+
+  # Query to get the total cotas for each fundo
+  cursor.execute("""
+      SELECT fundo, SUM(quantidade) AS total_cotas 
+      FROM compras AS c 
+      GROUP BY fundo;
+  """)
+
+  # Fetch all results from the executed query
+  fund_data = cursor.fetchall()
+
+  # Convert the result set into a pandas DataFrame
+  df = pd.DataFrame(fund_data, columns=["fundo", "total_cotas"])
+
+  # Close the connection
+  cursor.close()
+  db.close()
+
+  return df
